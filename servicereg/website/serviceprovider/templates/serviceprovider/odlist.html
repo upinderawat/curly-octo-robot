@@ -1,0 +1,18 @@
+<html>
+    {% if allorders %}
+        <h3>Orders</h3>
+        <ul>
+            {% for order in allorders %}
+            <li><input type="checkbox"><a href="/serviceprovider/orderdetails/{{ order.orderId }}/">  {{ order.orderId }} </a>   </li>
+            {% endfor %}
+        </ul>
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10">
+                <button type="submit" class="btn btn-success">Dispatch</button>
+            </div>
+        </div>
+        <!-- <h3>Dispatch</h3> -->
+    {% else %}
+        <h3>No orders to display</h3>
+    {% endif %}
+</html>

@@ -1,0 +1,12 @@
+<html>
+    {% if allorders %}
+        <h3>Orders</h3>
+        <ul>
+            {% for order in allorders %}
+            <li><a href="/serviceprovider/orderdetails/{{ order.orderId }}/">  {{ order.orderId }} </a>   </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <h3>No orders to display</h3>
+    {% endif %}
+</html>

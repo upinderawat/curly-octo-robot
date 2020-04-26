@@ -1,0 +1,27 @@
+<!-- <html>
+    <body>
+            <h1>{{ order.orderId }}</h1>
+            <h1>{{ order.customerId }}</h1>
+            <h1>{{ order.fulfilled }}</h1>
+    </body>
+</html> -->
+
+<!-- {{ order }} -->
+<h3>Order Details</h3>
+<h5>Order Id - {{ order.orderId }}</h5>
+<h5>Customer Id - {{ order.customerId }}</h5>
+<h5>Order Status - {{ order.fulfilled }}</h5>
+<h5>Order Type - {{ order.orderType }}</h5>
+<h5>Latitude Id - {{ order.latitude }}</h5>
+<h5>Longitude Id - {{ order.longitude }}</h5>
+
+{% if allitems %}
+    <h3>Items</h3>
+    <ul>
+        {% for item in allitems %}
+        <li><a href="/serviceprovider/orderdetails/itemdetails/{{ item.itemId }}/">  {{ item.itemId }} </a>   </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <h3>No Items to display</h3>
+{% endif %}
