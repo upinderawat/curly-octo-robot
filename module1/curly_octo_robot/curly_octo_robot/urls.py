@@ -16,10 +16,12 @@ Including another URLconf
 from django.contrib import admin
 from covid19 import views as covid19_views
 from user_accounts import views as user_accounts_views
+from sp_accounts import views as sp_accounts_views
 from django.urls import path
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('about/', covid19_views.about, name='about'),
-    path('register/',user_accounts_views.registration_view, name='user_register')
+    path('register/',user_accounts_views.registration_view, name='user_register'),
+    path('sp_register/',sp_accounts_views.registration_view, name='sp_register')
 ]
