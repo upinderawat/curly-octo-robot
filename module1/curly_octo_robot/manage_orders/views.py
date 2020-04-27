@@ -8,7 +8,7 @@ def place_order_view(request):
         form = OrderForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('/login')
+            return redirect('/place_order')
         else:
             context['place_order'] = form
     else:
