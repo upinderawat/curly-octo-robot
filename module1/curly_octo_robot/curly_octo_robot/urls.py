@@ -21,8 +21,10 @@ from delivery_accounts import views as delivery_accounts_views
 from django.urls import path
 
 urlpatterns = [
+    path('',covid19_views.login, name='start'),
     path('admin/', admin.site.urls),
     path('about/', covid19_views.about, name='about'),
+    path('login/', covid19_views.login, name='login'),
     path('register/',user_accounts_views.registration_view, name='user_register'),
     path('sp_register/',sp_accounts_views.registration_view, name='sp_register'),
     path('delivery_register/',delivery_accounts_views.registration_view, name='delivery_register')
