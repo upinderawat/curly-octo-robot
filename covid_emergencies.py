@@ -1,8 +1,14 @@
+import pandas as pd
+import numpy as np
+import re
+from sklearn.linear_model import LinearRegression
 class covid_predictions:
 
-  def __init__(self, window_size = 5):
+  def __init__(self, window_size = 5, number_of_days = 5, threshold = 0.0001):
     self.model = LinearRegression()
     self.window_size = window_size
+    self.number_of_days = number_of_days
+    self.threshold = threshold
 
   def set_data(self, data):
     self.data = data
@@ -10,9 +16,47 @@ class covid_predictions:
   def fit_model(self, X_train, y_train):
     self.model.fit(X_train, y_train)
 
-  def make_model_prediction(self, X_test):
-    y_pred = self.model.predict(X_test)
-    return int(round(y_pred[0]))
+  def clean_population_data(self, population_data):
+    population_data = population_data[['State / Union Territory', 'Population']]
+    state_uts1 = []
+    for index,row in population_data.iterrows():
+      state_ut1 = row['State / Union Territory']
+      state_ut1 = re.sub('[^A-Za-z0-9]+', '', state_ut1)
+      state_uts1.append(state_ut1)
+
+    population = population_data['Population']
+    population_data = population_data.drop(['State / Union Territory', 'Population'], axis=1)
+    population_data['State/UnionTerritory'] = state_uts1
+    population_data['Population'] = population
+
+    return population_data
+
+  def calculate_statewise_population(self, population_data):
+    statewise_population = {}
+    for index, row in population_data.iterrows():
+      statewise_population[row['State/UnionTerritory']] = row['Population']
+
+    return statewise_population
+
+  def get_state_population(self):
+    population_data = pd.read_csv('covid19-in-india/population_india_census2011.csv')
+    population_data = self.clean_population_data(population_data)
+    statewise_population = self.calculate_statewise_population(population_data)
+
+    return statewise_population
+
+  def make_model_prediction(self, value):
+    test = value[len(value) - self.number_of_days-1 : ]
+    predicted = []
+    for i in range(self.number_of_days):
+      test = test[1:]
+      test1 = np.array(test)
+      test1 = test1.reshape((1,-1))
+      prediction = self.model.predict(test1)
+      test.append(int(round(prediction[0])))
+      predicted.append(int(round(prediction[0])))
+    
+    return predicted
 
   def remove_special_characters(self, data):
     state_uts = []
@@ -29,7 +73,7 @@ class covid_predictions:
     return df1
 
   def get_statewise_confirmed_cases(self, unique_dates, unique_states):
-    df1 = create_dates_dataframe(unique_dates)
+    df1 = self.create_dates_dataframe(unique_dates)
 
     final = {}
     for state in unique_states:
@@ -101,11 +145,24 @@ class covid_predictions:
     for key, value in state_confirmed_dict.items():
       X_state = np.array(value)
       X_train, y_train = self.fit_train(np.array(value))
-      X_test = self.fit_test(X_train)
       self.fit_model(X_train, y_train)
-      state_prediction[key] = self.make_model_prediction(X_test)
+      state_prediction[key] = self.make_model_prediction(value)
 
     return state_prediction
+
+  def find_emergency_states(self, state_prediction):
+    emergency_states = []
+    statewise_population = self.get_state_population()
+    for key, value in state_prediction.items():
+      ratio = []
+      for i in value:
+        ratio.append(i/statewise_population[key])
+      for i in ratio:
+        if(i >= self.threshold):
+          emergency_states.append(key)
+        
+    emergency_states = set(emergency_states)
+    return emergency_states
 
   def train(self, path):
 
@@ -125,5 +182,6 @@ class covid_predictions:
 
     state_prediction = self.predict(state_confirmed_dict)
 
-    print(state_prediction)
+    emergency_states = self.find_emergency_states(state_prediction)
 
+    print(emergency_states)
