@@ -1,0 +1,18 @@
+<html>
+    {% if allagents %}
+        <h3>Available Delivery Agents</h3>
+        <ul>
+            {% for agent in allagents %}
+            <li><input type="checkbox"><a href="http://127.0.0.1:8000/delivery_login/{{ agent.id }}/">  {{ agent.id }} </a>   </li>
+            {% endfor %}
+        </ul>
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10">
+                <button type="submit" class="btn btn-success">Accept</button>
+            </div>
+        </div>
+        <!-- <h3>Dispatch</h3> -->
+    {% else %}
+        <h3>No delivery agent is free to display</h3>
+    {% endif %}
+</html> 
