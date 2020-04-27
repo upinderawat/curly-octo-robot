@@ -8,6 +8,7 @@ urlpatterns = [
     url(r'^register/$', views.register, name='register'),
     url(r'^login/$', views.login_user, name='login_user'),
     url(r'^logout/$', views.logout_user, name='logout_user'),
+    url(r'^save_state/$', views.save_state, name='logout_user'),
     # url(r'^ordersdetail/$', views.index, name='index'),
     url(r'^(?P<serviceprovider_id>[0-9]+)/$', views.serviceProviderDetails, name='sd'),
     url(r'^orderdetails/$', views.index, name='index'),

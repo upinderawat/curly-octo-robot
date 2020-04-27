@@ -11,6 +11,9 @@ from .forms import UserForm
 from django.db.models import Q
 from django.template import loader
 from django.db.models import F, Func
+from django.views.decorators.csrf import csrf_exempt
+import json
+
 
 
 def index(request):
@@ -52,11 +55,13 @@ def serviceProviderDetails(request, serviceprovider_id):
 
 def spOrderDetails(request, serviceprovider_id):
     sprovider = get_object_or_404(Service, pk=serviceprovider_id)
+    # global sp 
+    # sp = sprovider.serviceProviderId
     alpha = 2
     alpha = alpha**2
     all_orders = Orders.objects.all().filter(orderType=sprovider.serviceProviderType, fulfilled=False)
     all_orders = all_orders.annotate(result=(F('latitude')-sprovider.latitude)**2+(F('longitude')-sprovider.longitude)**2).filter(result__lt=alpha)
-    context= {'allorders': all_orders}
+    context= {'allorders': all_orders, 'sprovider':sprovider.serviceProviderId, 'sprovidername':sprovider.serviceProviderName}
     return render(request, 'serviceprovider/odlist.html', context)
 
 def login_user(request):
@@ -107,3 +112,30 @@ def logout_user(request):
         "form": form,
     }
     return render(request, 'serviceprovider/login.html', context)
+
+
+@csrf_exempt
+def save_state(request):
+    print("hello")
+    if request.method == 'POST':
+        # title = request.POST.get('selectItems')
+        # title = request.body.decode("utf-8") 
+        selecteditems = json.loads(request.body.decode("utf-8"))["selectItems"]
+        sname = json.loads(request.body.decode("utf-8"))["id"]
+        servicep = get_object_or_404(Service, pk=sname)
+        for i in selecteditems:
+            order = get_object_or_404(Orders, pk=i)
+            order.fulfilled=True
+            order.save()
+
+            # service = get_object_or_404(Service, pk=order.orderType)
+            o=Order_Dispatch(service_id=servicep, order_id=order)
+            o.save()
+            # print(i)
+
+        # print(selecteditems)
+        # print(checked)
+        # todo = Todo.objects.get(title=title)
+        # todo.completed = checked
+        # todo.save()
+    return render(request, 'serviceprovider/providerdetails.html')
