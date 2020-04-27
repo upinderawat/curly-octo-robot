@@ -31,6 +31,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'manage_orders.apps.ManagerOrdersConfig',
     'delivery_accounts.apps.DeliveryAccountsConfig',
     'sp_accounts.apps.SpAccountsConfig',
     'covid19.apps.Covid19Config',
